@@ -4,8 +4,10 @@ using Currencies.Entities;
 
 namespace Currencies
 {
-    public interface ICurrenciesApi
+    interface ICurrenciesApiCacheService
     {
+        Task Initialize();
+
         Task<Currency[]> GetCurrencies(bool afterDenomination = true);
 
         Task<CurrencyRate> GetCurrencyRate(int currencyId);

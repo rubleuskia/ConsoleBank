@@ -10,6 +10,9 @@ namespace Currencies.Entities
         [JsonProperty("Cur_Scale")]
         public int Scale { get; set; }
 
+        [JsonProperty("Cur_Abbreviation")]
+        public string Abbreviation { get; set; }
+
         [JsonProperty("Cur_OfficialRate")]
         public double Rate { get; set; }
 
