@@ -1,8 +1,9 @@
+using System;
 using Newtonsoft.Json;
 
-namespace Currencies.Entities
+namespace Currencies.Apis.Byn.Entities
 {
-    public class CurrencyRate
+    internal class CurrencyRate
     {
         [JsonProperty("Cur_ID")]
         public int Id { get; set; }
@@ -13,12 +14,13 @@ namespace Currencies.Entities
         [JsonProperty("Cur_Abbreviation")]
         public string Abbreviation { get; set; }
 
+        [JsonProperty("Cur_Name")]
+        public string Name { get; set; }
+
         [JsonProperty("Cur_OfficialRate")]
         public double Rate { get; set; }
 
-        public override string ToString()
-        {
-            return $"{Id} - {Scale} - {Rate}";
-        }
+        [JsonProperty("Date")]
+        public DateTime Date { get; set; }
     }
 }

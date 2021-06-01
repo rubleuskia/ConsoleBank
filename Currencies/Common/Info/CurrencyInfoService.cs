@@ -1,17 +1,18 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Currencies.Entities;
+using Currencies.Common.Cache;
+using Currencies.Common.Conversion;
 
-namespace Currencies
+namespace Currencies.Common.Info
 {
     public class CurrencyInfoService : ICurrencyInfoService
     {
         private readonly ICurrenciesConverter _converter;
-        private readonly ICurrenciesApi _api;
+        private readonly ICurrenciesApiCacheService _api;
         private readonly string[] _availableCurrencies = { "USD", "EUR", "RUB" };
 
-        public CurrencyInfoService(ICurrenciesApi currenciesApi, ICurrenciesConverter converter)
+        public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi, ICurrenciesConverter converter)
         {
             _api = currenciesApi;
             _converter = converter;
@@ -19,17 +20,17 @@ namespace Currencies
 
         public async Task<string[]> GetAvailableCurrencies()
         {
-            Currency[] currencies = await _api.GetCurrencies();
+            CurrencyModel[] currencies = await _api.GetCurrencies();
 
             return currencies
-                .Where(currency => _availableCurrencies.Contains(currency.Abbreviation))
-                .Select(currency => $"{currency.Abbreviation} - {currency.Name}")
+                .Where(currency => _availableCurrencies.Contains(currency.CharCode))
+                .Select(currency => $"{currency.CharCode} - {currency.Name}")
                 .ToArray();
         }
 
         public async Task<double> GetCurrencyRate(string abbreviation, DateTime? onDate)
         {
-            CurrencyRate rate = await GetCurrencyRateInternal(abbreviation, onDate);
+            CurrencyRateModel rate = await GetCurrencyRateInternal(abbreviation, onDate);
             return rate?.Rate ?? 0d;
         }
 
@@ -64,25 +65,17 @@ namespace Currencies
         }
 
         // TODO: start < 2016 => additional handling (?)
-        private async Task<CurrencyRateShort[]> GetDynamics(string abbreviation, DateTime start, DateTime end)
+        private async Task<CurrencyRateModel[]> GetDynamics(string charCode, DateTime start, DateTime end)
         {
             if (start.Year <= 2016)
             {
                 throw new NotImplementedException("Dates before denomination are not supported yet.");
             }
 
-            var currencyId = await GetCurrencyId(abbreviation);
-            return await _api.GetDynamics(currencyId, start, end);
+            return await _api.GetDynamics(charCode, start, end);
         }
 
-        // TODO: support denomination (add DateTime onDate)
-        private async Task<int> GetCurrencyId(string abbreviation)
-        {
-            Currency[] currencies = await _api.GetCurrencies();
-            return currencies.Single(x => x.Abbreviation == abbreviation).Id;
-        }
-
-        private async Task<CurrencyRate> GetCurrencyRateInternal(string abbreviation, DateTime? onDate = null)
+        private async Task<CurrencyRateModel> GetCurrencyRateInternal(string abbreviation, DateTime? onDate = null)
         {
             if (!_availableCurrencies.Contains(abbreviation))
             {

@@ -1,9 +1,9 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Currencies.Entities
+namespace Currencies.Apis.Byn.Entities
 {
-    public class Currency
+    internal class Currency
     {
         [JsonProperty("Cur_ID")]
         public int Id { get; set; }
@@ -19,10 +19,5 @@ namespace Currencies.Entities
 
         [JsonProperty("Cur_DateEnd")]
         public DateTime DateEnd { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Id} - {Code} - {Abbreviation} - {Name}";
-        }
     }
 }

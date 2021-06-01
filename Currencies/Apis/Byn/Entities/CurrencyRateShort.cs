@@ -1,9 +1,9 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Currencies.Entities
+namespace Currencies.Apis.Byn.Entities
 {
-    public class CurrencyRateShort
+    internal class CurrencyRateShort
     {
         [JsonProperty("Cur_ID")]
         public int Id { get; set; }

@@ -1,6 +1,6 @@
 using System;
 
-namespace Currencies
+namespace Currencies.Exceptions
 {
     public class CurrencyNotAvailableException : Exception
     {

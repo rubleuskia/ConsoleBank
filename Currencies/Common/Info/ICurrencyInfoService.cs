@@ -1,8 +1,7 @@
-
 using System;
 using System.Threading.Tasks;
 
-namespace Currencies
+namespace Currencies.Common.Info
 {
     // class CurrencyParameters
     // {
