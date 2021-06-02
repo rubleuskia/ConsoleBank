@@ -1,8 +1,7 @@
-
 using System;
 using System.Threading.Tasks;
 
-namespace Currencies
+namespace Currencies.Common.Infos
 {
     // class CurrencyParameters
     // {
@@ -14,7 +13,7 @@ namespace Currencies
     {
         Task<string[]> GetAvailableCurrencies();
 
-        Task<double> GetCurrencyRate(string abbreviation, DateTime? onDate = null);
+        Task<double> GetCurrencyRate(string charCode, DateTime? onDate = null);
 
         Task<double> ConvertTo(double amount, string abbreviation);
 
@@ -22,7 +21,7 @@ namespace Currencies
 
         Task<double> GetMinRate(string abbreviation, DateTime start, DateTime end);
 
-        Task<double> GetManRate(string abbreviation, DateTime start, DateTime end);
+        Task<double> GetMaxRate(string abbreviation, DateTime start, DateTime end);
 
         Task<double> GetAvgRate(string abbreviation, DateTime start, DateTime end);
     }
