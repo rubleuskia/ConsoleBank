@@ -10,6 +10,7 @@ namespace Currencies.Common.Infos
     {
         private readonly ICurrenciesConverter _converter;
         private readonly ICurrenciesApiCacheService _api;
+        // TODO obsolete
         private readonly string[] _availableCurrencies = { "USD", "EUR", "RUB" };
 
         public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi, ICurrenciesConverter converter)
