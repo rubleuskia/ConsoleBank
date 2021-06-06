@@ -11,6 +11,7 @@ namespace Currencies.Apis.Rub
 {
     public class RubCurrenciesApi : ICurrenciesApi
     {
+        private const string DefaultCurrencyCode = "RUB";
         private const string BaseApiUrl = "http://www.cbr.ru/scripts";
         private readonly string _currencyRatesDynamicsApiUrl = $"{BaseApiUrl}/rates/dynamics";
         private readonly string _currencyRatesApiUrl = $"{BaseApiUrl}/XML_daily.asp";
@@ -30,6 +31,19 @@ namespace Currencies.Apis.Rub
 
         public async Task<CurrencyRateModel> GetCurrencyRate(string charCode, DateTime? onDate = null)
         {
+            if (charCode == DefaultCurrencyCode)
+            {
+                return new CurrencyRateModel
+                {
+                    Date = onDate ?? DateTime.Today,
+                    Id = string.Empty,
+                    Name = "Russian ruble",
+                    Nominal = 1,
+                    Rate = 1,
+                    CharCode = DefaultCurrencyCode
+                };
+            }
+
             var date = onDate ?? DateTime.Today;
             string xmlResponse = await CallApi(() => _currencyRatesApiUrl
                 .SetQueryParam("date_req", date.ToString("dd/MM/yyyy"))

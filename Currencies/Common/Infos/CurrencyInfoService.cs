@@ -2,21 +2,16 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Currencies.Common.Caching;
-using Currencies.Common.Conversion;
 
 namespace Currencies.Common.Infos
 {
     public class CurrencyInfoService : ICurrencyInfoService
     {
-        private readonly ICurrenciesConverter _converter;
         private readonly ICurrenciesApiCacheService _api;
-        // TODO obsolete
-        private readonly string[] _availableCurrencies = { "USD", "EUR", "RUB" };
 
-        public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi, ICurrenciesConverter converter)
+        public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi)
         {
             _api = currenciesApi;
-            _converter = converter;
         }
 
         public async Task<string[]> GetAvailableCurrencies()
@@ -24,27 +19,14 @@ namespace Currencies.Common.Infos
             CurrencyModel[] currencies = await _api.GetCurrencies();
 
             return currencies
-                .Where(currency => _availableCurrencies.Contains(currency.CharCode))
                 .Select(currency => $"{currency.CharCode} - {currency.Name}")
                 .ToArray();
         }
 
         public async Task<double> GetCurrencyRate(string charCode, DateTime? onDate)
         {
-            CurrencyRateModel rate = await GetCurrencyRateInternal(charCode, onDate);
+            CurrencyRateModel rate = await _api.GetCurrencyRate(charCode, onDate);
             return rate?.Rate ?? 0d;
-        }
-
-        public async Task<double> ConvertTo(double amount, string abbreviation)
-        {
-            var rate = await GetCurrencyRateInternal(abbreviation);
-            return rate != null ? _converter.ConvertTo(amount, rate) : 0;
-        }
-
-        public async Task<double> ConvertFrom(double amount, string abbreviation)
-        {
-            var rate = await GetCurrencyRateInternal(abbreviation);
-            return rate != null ? _converter.ConvertFrom(amount, rate) : 0;
         }
 
         public async Task<double> GetMinRate(string abbreviation, DateTime start, DateTime end)
@@ -68,16 +50,6 @@ namespace Currencies.Common.Infos
         private async Task<CurrencyRateModel[]> GetDynamics(string charCode, DateTime start, DateTime end)
         {
             return await _api.GetDynamics(charCode, start, end);
-        }
-
-        private async Task<CurrencyRateModel> GetCurrencyRateInternal(string abbreviation, DateTime? onDate = null)
-        {
-            if (!_availableCurrencies.Contains(abbreviation))
-            {
-                return null;
-            }
-
-            return await _api.GetCurrencyRate(abbreviation, onDate);
         }
     }
 }
