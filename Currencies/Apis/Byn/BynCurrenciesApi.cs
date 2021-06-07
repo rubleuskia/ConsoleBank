@@ -11,6 +11,7 @@ namespace Currencies.Apis.Byn
 {
     public class BynCurrenciesApi : ICurrenciesApi
     {
+        // TODO BYN
         private const string BaseApiUrl = "https://www.nbrb.by/api/exrates";
         private readonly string _currencyRatesDynamicsApiUrl = $"{BaseApiUrl}/rates/dynamics";
         private readonly string _currencyRatesApiUrl = $"{BaseApiUrl}/rates";

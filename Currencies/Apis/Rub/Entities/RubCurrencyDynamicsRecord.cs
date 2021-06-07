@@ -1,12 +1,20 @@
 using System;
+using System.Globalization;
 using System.Xml.Serialization;
 
 namespace Currencies.Apis.Rub.Entities
 {
-    public class CurrencyDynamicsInfo
+    public class RubCurrencyDynamicsRecord
     {
-        [XmlElement("Date", DataType="date")]
+        [XmlIgnore]
         public DateTime Date { get; set; }
+
+        [XmlElement("Date")]
+        public string DateSerialized
+        {
+            get => Date.ToString("dd'.'MM'.'yyyy");
+            set => Date = DateTime.ParseExact(value, "dd'.'MM'.'yyyy", CultureInfo.InvariantCulture);
+        }
 
         [XmlElement("Nominal")]
         public int Nominal { get; set; }

@@ -34,18 +34,18 @@ namespace Currencies.Common.Infos
             CurrencyRateModel rate = await GetCurrencyRateInternal(charCode, onDate);
             return rate?.Rate ?? 0d;
         }
-
-        public async Task<double> ConvertTo(double amount, string abbreviation)
-        {
-            var rate = await GetCurrencyRateInternal(abbreviation);
-            return rate != null ? _converter.ConvertTo(amount, rate) : 0;
-        }
-
-        public async Task<double> ConvertFrom(double amount, string abbreviation)
-        {
-            var rate = await GetCurrencyRateInternal(abbreviation);
-            return rate != null ? _converter.ConvertFrom(amount, rate) : 0;
-        }
+        //
+        // public async Task<double> ConvertTo(double amount, string abbreviation)
+        // {
+        //     var rate = await GetCurrencyRateInternal(abbreviation);
+        //     return rate != null ? _converter.ConvertToLocal(amount, rate) : 0;
+        // }
+        //
+        // public async Task<double> ConvertFrom(double amount, string abbreviation)
+        // {
+        //     var rate = await GetCurrencyRateInternal(abbreviation);
+        //     return rate != null ? _converter.ConvertFromLocal(amount, rate) : 0;
+        // }
 
         public async Task<double> GetMinRate(string abbreviation, DateTime start, DateTime end)
         {

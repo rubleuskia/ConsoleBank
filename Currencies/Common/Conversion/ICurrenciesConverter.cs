@@ -2,7 +2,7 @@ namespace Currencies.Common.Conversion
 {
     public interface ICurrenciesConverter
     {
-        double ConvertTo(double amount, CurrencyRateModel rate);
-        double ConvertFrom(double amount, CurrencyRateModel rate);
+        double ConvertToLocal(double amount, CurrencyRateModel rate);
+        double ConvertFromLocal(double amount, CurrencyRateModel rate);
     }
 }

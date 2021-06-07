@@ -15,9 +15,9 @@ namespace Currencies.Common.Infos
 
         Task<double> GetCurrencyRate(string charCode, DateTime? onDate = null);
 
-        Task<double> ConvertTo(double amount, string abbreviation);
-
-        Task<double> ConvertFrom(double amount, string abbreviation);
+        // Task<double> ConvertTo(double amount, string abbreviation);
+        //
+        // Task<double> ConvertFrom(double amount, string abbreviation);
 
         Task<double> GetMinRate(string abbreviation, DateTime start, DateTime end);
 

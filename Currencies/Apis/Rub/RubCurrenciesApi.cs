@@ -11,10 +11,36 @@ namespace Currencies.Apis.Rub
 {
     public class RubCurrenciesApi : ICurrenciesApi
     {
+        // TODO RUB
+        private const string RequestDateFormat = "dd/MM/yyyy";
         private const string BaseApiUrl = "http://www.cbr.ru/scripts";
-        private readonly string _currencyRatesDynamicsApiUrl = $"{BaseApiUrl}/rates/dynamics";
+        private readonly string _currencyRatesDynamicsApiUrl = $"{BaseApiUrl}/XML_dynamic.asp";
         private readonly string _currencyRatesApiUrl = $"{BaseApiUrl}/XML_daily.asp";
         private readonly string _currenciesApiUrl = $"{BaseApiUrl}/XML_valFull.asp";
+
+        public async Task<CurrencyRateModel[]> GetDynamics(string charCode, DateTime start, DateTime end)
+        {
+            CurrencyRateModel currencyRate = await GetCurrencyRate(charCode, start);
+            string xmlResponse = await CallApi(() => _currencyRatesDynamicsApiUrl
+                .SetQueryParams(new
+                {
+                    date_req1 = GetFormattedDate(start),
+                    date_req2 = GetFormattedDate(end),
+                    VAL_NM_RQ = currencyRate.Id,
+                })
+                .GetStringAsync());
+
+            var response = XmlUtils.ParseXml<RubCurrencyDynamicsResponse>(xmlResponse);
+            return response.Records.Select(x => new CurrencyRateModel
+            {
+                Id = currencyRate.Id,
+                Name = currencyRate.Name,
+                CharCode = charCode,
+                Date = x.Date,
+                Nominal = x.Nominal,
+                Rate = x.Rate,
+            }).ToArray();
+        }
 
         public async Task<CurrencyModel[]> GetCurrencies(DateTime? onDate = null)
         {
@@ -32,7 +58,7 @@ namespace Currencies.Apis.Rub
         {
             var date = onDate ?? DateTime.Today;
             string xmlResponse = await CallApi(() => _currencyRatesApiUrl
-                .SetQueryParam("date_req", date.ToString("dd/MM/yyyy"))
+                .SetQueryParam("date_req", GetFormattedDate(date))
                 .GetStringAsync());
 
             var response = XmlUtils.ParseXml<RubCurrencyRateResponse>(xmlResponse);
@@ -48,11 +74,6 @@ namespace Currencies.Apis.Rub
             };
         }
 
-        public Task<CurrencyRateModel[]> GetDynamics(string charCode, DateTime start, DateTime end)
-        {
-            throw new NotImplementedException();
-        }
-
         // TODO: base class?
         private static async Task<T> CallApi<T>(Func<Task<T>> func)
         {
@@ -64,6 +85,11 @@ namespace Currencies.Apis.Rub
             {
                 throw new CurrencyNotAvailableException("Currency not available");
             }
+        }
+
+        private string GetFormattedDate(DateTime date)
+        {
+            return date.ToString(RequestDateFormat);
         }
     }
 }
