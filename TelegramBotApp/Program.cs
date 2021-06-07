@@ -150,7 +150,7 @@ namespace TelegramBotApp
 
             static async Task RequestContactAndLocation(Message message)
             {
-                var RequestReplyKeyboard = new ReplyKeyboardMarkup(new[]
+                var requestReplyKeyboard = new ReplyKeyboardMarkup(new[]
                 {
                     KeyboardButton.WithRequestLocation("Location"),
                     KeyboardButton.WithRequestContact("Contact"),
@@ -159,7 +159,7 @@ namespace TelegramBotApp
                 await _botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
                     text: "Who or Where are you?",
-                    replyMarkup: RequestReplyKeyboard
+                    replyMarkup: requestReplyKeyboard
                 );
             }
 
@@ -213,27 +213,30 @@ namespace TelegramBotApp
             await _botClient.AnswerInlineQueryAsync(inlineQuery.Id, results, isPersonal: true, cacheTime: 0);
         }
 
-        private static async Task BotOnChosenInlineResultReceived(ChosenInlineResult chosenInlineResult)
+        private static Task BotOnChosenInlineResultReceived(ChosenInlineResult chosenInlineResult)
         {
             Console.WriteLine($"Received inline result: {chosenInlineResult.ResultId}");
+            return Task.CompletedTask;
         }
 
         #endregion
 
-        private static async Task UnknownUpdateHandlerAsync(Update update)
+        private static Task UnknownUpdateHandlerAsync(Update update)
         {
             Console.WriteLine($"Unknown update type: {update.Type}");
+            return Task.CompletedTask;
         }
 
-        private static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        private static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            var ErrorMessage = exception switch
+            var errorMessage = exception switch
             {
                 ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
 
-            Console.WriteLine(ErrorMessage);
+            Console.WriteLine(errorMessage);
+            return Task.CompletedTask;
         }
     }
 }
