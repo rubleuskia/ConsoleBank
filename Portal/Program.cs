@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Accounting;
 using Accounting.Tracking;
 using Currencies.Apis.Byn;
+using Currencies.Apis.Rub;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
 using Currencies.Common.Infos;

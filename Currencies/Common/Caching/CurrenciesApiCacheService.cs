@@ -7,8 +7,8 @@ namespace Currencies.Common.Caching
 {
     public class CurrenciesApiCacheService : ICurrenciesApiCacheService
     {
-        private List<CurrencyModel> _currenciesCache = new();
-        private Dictionary<string, List<CurrencyRateModel>> _ratesCache = new();
+        private List<CurrencyModel> _currenciesCache = new List<CurrencyModel>();
+        private Dictionary<string, List<CurrencyRateModel>> _ratesCache = new Dictionary<string, List<CurrencyRateModel>>();
 
         private readonly ICurrenciesApi _currenciesApi;
 
