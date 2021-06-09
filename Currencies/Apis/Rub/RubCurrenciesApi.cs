@@ -56,6 +56,7 @@ namespace Currencies.Apis.Rub
 
         public async Task<CurrencyRateModel> GetCurrencyRate(string charCode, DateTime? onDate = null)
         {
+            // TODO if charCode == BYN => 1 : 1
             var date = onDate ?? DateTime.Today;
             string xmlResponse = await CallApi(() => _currencyRatesApiUrl
                 .SetQueryParam("date_req", GetFormattedDate(date))

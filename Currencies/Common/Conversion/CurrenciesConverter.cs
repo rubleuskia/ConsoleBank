@@ -1,16 +1,16 @@
 namespace Currencies.Common.Conversion
 {
     // TODO write unit tests
-    public class CurrenciesConverter : ICurrenciesConverter
+    public static class CurrenciesConverter
     {
-        public double ConvertToLocal(double amount, CurrencyRateModel rate)
+        public static decimal ConvertToLocal(decimal amount, CurrencyRateModel rate)
         {
-            return amount * rate.Rate / rate.Nominal;
+             return amount * (decimal)rate.Rate / rate.Nominal;
         }
 
-        public double ConvertFromLocal(double amount, CurrencyRateModel rate)
+        public static decimal ConvertFromLocal(decimal amount, CurrencyRateModel rate)
         {
-            return amount / rate.Rate * rate.Nominal;
+            return amount / (decimal)rate.Rate * rate.Nominal;
         }
     }
 }

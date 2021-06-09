@@ -8,15 +8,15 @@ namespace Currencies.Common.Infos
 {
     public class CurrencyInfoService : ICurrencyInfoService
     {
-        private readonly ICurrenciesConverter _converter;
         private readonly ICurrenciesApiCacheService _api;
+        private readonly ICurrencyConversionService _conversion;
         // TODO obsolete
         private readonly string[] _availableCurrencies = { "USD", "EUR", "RUB" };
 
-        public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi, ICurrenciesConverter converter)
+        public CurrencyInfoService(ICurrenciesApiCacheService currenciesApi, ICurrencyConversionService conversion)
         {
             _api = currenciesApi;
-            _converter = converter;
+            _conversion = conversion;
         }
 
         public async Task<string[]> GetAvailableCurrencies()
@@ -34,18 +34,16 @@ namespace Currencies.Common.Infos
             CurrencyRateModel rate = await GetCurrencyRateInternal(charCode, onDate);
             return rate?.Rate ?? 0d;
         }
-        //
-        // public async Task<double> ConvertTo(double amount, string abbreviation)
-        // {
-        //     var rate = await GetCurrencyRateInternal(abbreviation);
-        //     return rate != null ? _converter.ConvertToLocal(amount, rate) : 0;
-        // }
-        //
-        // public async Task<double> ConvertFrom(double amount, string abbreviation)
-        // {
-        //     var rate = await GetCurrencyRateInternal(abbreviation);
-        //     return rate != null ? _converter.ConvertFromLocal(amount, rate) : 0;
-        // }
+
+        public Task<decimal> ConvertToLocal(decimal amount, string charCode)
+        {
+            return _conversion.ConvertToLocal(amount, charCode);
+        }
+
+        public Task<decimal> ConvertFromLocal(decimal amount, string charCode)
+        {
+            return _conversion.ConvertFromLocal(amount, charCode);
+        }
 
         public async Task<double> GetMinRate(string abbreviation, DateTime start, DateTime end)
         {

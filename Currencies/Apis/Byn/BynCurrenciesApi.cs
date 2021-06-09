@@ -30,6 +30,19 @@ namespace Currencies.Apis.Byn
 
         public async Task<CurrencyRateModel> GetCurrencyRate(string charCode, DateTime? onDate)
         {
+            if (charCode == "BYN")
+            {
+                return new CurrencyRateModel
+                {
+                    Date = DateTime.Today,
+                    Id = "0",
+                    Name = "BYN",
+                    Nominal = 1,
+                    Rate = 1,
+                    CharCode = "BYN"
+                };
+            }
+
             var result = _currencyRatesApiUrl
                 .AppendPathSegment(charCode)
                 .SetQueryParams(new
