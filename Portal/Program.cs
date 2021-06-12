@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Accounting;
 using Accounting.ActivityTracking;
+using Accounting.EventHub;
 using Currencies.Apis.Byn;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
@@ -11,18 +12,19 @@ namespace Portal
 {
     class Program
     {
+        private static IEventBus _eventBus = new EventBus();
         private static ICurrenciesApiCacheService apiCache =
             new CurrenciesApiCacheService(new BynCurrenciesApi());
         private static ICurrencyInfoService _infoService =
             new CurrencyInfoService(apiCache, new CurrencyConversionService(apiCache));
 
         private static IAccountsRepository repository = new AccountsRepository();
-        private static IAccountAcquiringService acquiringService = new AccountAcquiringService(repository);
+        private static IAccountAcquiringService acquiringService = new AccountAcquiringService(repository, _eventBus);
         private static ICurrencyConversionService conversionService = new CurrencyConversionService(apiCache);
         private static IAccountTransferService transferService =
-            new AccountTransferService(repository, acquiringService,conversionService);
+            new AccountTransferService(repository, acquiringService, _eventBus, conversionService);
 
-        private static AccountActivityTracker _activityTracker = new(acquiringService, transferService);
+        private static AccountActivityTracker _activityTracker = new(_eventBus);
         private static AccountManagementService _accountManagementService = new(repository, acquiringService, transferService);
 
         static async Task Main(string[] args)

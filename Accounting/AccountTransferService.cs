@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Accounting.EventHub;
 using Currencies.Common.Conversion;
 
 namespace Accounting
@@ -9,20 +10,21 @@ namespace Accounting
     {
         private readonly IAccountsRepository _accountsRepository;
         private readonly IAccountAcquiringService _accountAcquiringService;
+        private readonly IEventBus _eventBus;
         private readonly ICurrencyConversionService _currencyConversionService;
         private readonly List<Transaction> _transactions = new();
 
         public AccountTransferService(
             IAccountsRepository accountsRepository,
             IAccountAcquiringService accountAcquiringService,
+            IEventBus eventBus,
             ICurrencyConversionService currencyConversionService)
         {
             _accountsRepository = accountsRepository;
             _accountAcquiringService = accountAcquiringService;
+            _eventBus = eventBus;
             _currencyConversionService = currencyConversionService;
         }
-
-        public event AccountTransferHandler TransferPerformed = (_, _, _) => {};
 
         public async Task Transfer(AccountTransferParameters parameters)
         {
@@ -90,7 +92,12 @@ namespace Accounting
 
                 await acquireFunc(lockKey);
                 transaction.IsAcquireCompleted = true;
-                TransferPerformed(fromAccount.Id, toAccount.Id, parameters.Amount);
+                _eventBus.Publish(new AccountTransferredEvent
+                {
+                    From = fromAccount.Id,
+                    To = toAccount.Id,
+                    Amount = parameters.Amount,
+                });
             }
             catch
             {

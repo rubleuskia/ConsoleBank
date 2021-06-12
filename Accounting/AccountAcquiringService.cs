@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Accounting.EventHub;
 
 namespace Accounting
 {
@@ -7,15 +8,13 @@ namespace Accounting
     {
         private readonly object _syncRoot = new();
         private readonly IAccountsRepository _accountsRepository;
+        private readonly IEventBus _eventBus;
 
-        public AccountAcquiringService(IAccountsRepository accountsRepository)
+        public AccountAcquiringService(IAccountsRepository accountsRepository, IEventBus eventBus)
         {
             _accountsRepository = accountsRepository;
+            _eventBus = eventBus;
         }
-
-        public event WithdrawnHandler Withdrawn = (_, _) => {};
-
-        public event AcquiredHandler Acquired = (_, _) => {};
 
         public async Task Withdraw(Guid accountId, decimal amount, Guid lockKey)
         {
@@ -32,7 +31,11 @@ namespace Accounting
             }
 
             account.Amount -= amount;
-            Withdrawn(accountId, amount);
+            _eventBus.Publish(new AccountWithdrawnEvent
+            {
+                AccountId = accountId,
+                Amount = amount,
+            });
         }
 
         public async Task Acquire(Guid accountId, decimal amount, Guid lockKey)
@@ -44,7 +47,11 @@ namespace Accounting
             }
 
             account.Amount += amount;
-            Acquired(accountId, amount);
+            _eventBus.Publish(new AccountAcquiredEvent
+            {
+                AccountId = accountId,
+                Amount = amount,
+            });
         }
 
         public async Task<bool> TryLock(Guid accountId, Guid key)

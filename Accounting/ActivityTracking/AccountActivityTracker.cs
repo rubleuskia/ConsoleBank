@@ -1,42 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accounting.EventHub;
 
 namespace Accounting.ActivityTracking
 {
-    public enum ActivityType
-    {
-        Withdraw,
-        Acquire,
-        Transfer,
-    }
-
     public class AccountActivityTracker : IAccountActivityTracker
     {
         private readonly List<AccountActivity> _activities = new();
 
-        public AccountActivityTracker(IAccountAcquiringService acquiringService, IAccountTransferService transferService)
+        public AccountActivityTracker(IEventBus eventBus)
         {
-            acquiringService.Acquired += OnAccountAcquired;
-            acquiringService.Withdrawn += OnAccountWithdraw;
-
-            transferService.TransferPerformed += OnAccountTransferred;
+            eventBus.Subscribe<AccountTransferredEvent>(OnAccountTransferred);
+            eventBus.Subscribe<AccountWithdrawnEvent>(OnAccountWithdraw);
+            eventBus.Subscribe<AccountAcquiredEvent>(OnAccountAcquired);
         }
 
-        private void OnAccountTransferred(Guid from, Guid to, decimal amount)
+        private void OnAccountTransferred(AccountTransferredEvent @event)
         {
-            OnAccountActivity(ActivityType.Transfer, from, -amount);
-            OnAccountActivity(ActivityType.Transfer, to, amount);
+            OnAccountActivity(ActivityType.Transfer, @event.From, -@event.Amount);
+            OnAccountActivity(ActivityType.Transfer, @event.To, @event.Amount);
         }
 
-        private void OnAccountWithdraw(Guid accountId, decimal amount)
+        private void OnAccountWithdraw(AccountWithdrawnEvent @event)
         {
-            OnAccountActivity(ActivityType.Withdraw, accountId, amount);
+            OnAccountActivity(ActivityType.Withdraw, @event.AccountId, @event.Amount);
         }
 
-        private void OnAccountAcquired(Guid accountId, decimal amount)
+        private void OnAccountAcquired(AccountAcquiredEvent @event)
         {
-            OnAccountActivity(ActivityType.Acquire, accountId, amount);
+            OnAccountActivity(ActivityType.Acquire, @event.AccountId, @event.Amount);
         }
 
         private void OnAccountActivity(ActivityType type, Guid accountId, decimal amount)
