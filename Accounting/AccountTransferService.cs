@@ -22,6 +22,8 @@ namespace Accounting
             _currencyConversionService = currencyConversionService;
         }
 
+        public event AccountTransferHandler TransferPerformed = (_, _, _) => {};
+
         public async Task Transfer(AccountTransferParameters parameters)
         {
             await RunWithTransaction(
@@ -88,6 +90,7 @@ namespace Accounting
 
                 await acquireFunc(lockKey);
                 transaction.IsAcquireCompleted = true;
+                TransferPerformed(fromAccount.Id, toAccount.Id, parameters.Amount);
             }
             catch
             {

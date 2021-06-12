@@ -13,6 +13,10 @@ namespace Accounting
             _accountsRepository = accountsRepository;
         }
 
+        public event WithdrawnHandler Withdrawn = (_, _) => {};
+
+        public event AcquiredHandler Acquired = (_, _) => {};
+
         public async Task Withdraw(Guid accountId, decimal amount, Guid lockKey)
         {
             var account = await _accountsRepository.GetById(accountId);
@@ -28,6 +32,7 @@ namespace Accounting
             }
 
             account.Amount -= amount;
+            Withdrawn(accountId, amount);
         }
 
         public async Task Acquire(Guid accountId, decimal amount, Guid lockKey)
@@ -39,6 +44,7 @@ namespace Accounting
             }
 
             account.Amount += amount;
+            Acquired(accountId, amount);
         }
 
         public async Task<bool> TryLock(Guid accountId, Guid key)

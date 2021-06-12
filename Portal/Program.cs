@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Accounting;
+using Accounting.ActivityTracking;
 using Currencies.Apis.Byn;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
@@ -21,8 +22,8 @@ namespace Portal
         private static IAccountTransferService transferService =
             new AccountTransferService(repository, acquiringService,conversionService);
 
-        private static AccountManagementService _accountManagementService =
-            new AccountManagementService(repository, acquiringService, transferService);
+        private static AccountActivityTracker _activityTracker = new(acquiringService, transferService);
+        private static AccountManagementService _accountManagementService = new(repository, acquiringService, transferService);
 
         static async Task Main(string[] args)
         {
@@ -44,11 +45,54 @@ namespace Portal
                 CurrencyCharCode = "RUB"
             });
 
+            await _accountManagementService.Transfer(new AccountTransferParameters
+            {
+                FromAccount = accountEur,
+                ToAccount = accountUsd,
+                Amount = 7200,
+                CurrencyCharCode = "RUB"
+            });
+
+            await _accountManagementService.Transfer(new AccountTransferParameters
+            {
+                FromAccount = accountEur,
+                ToAccount = accountUsd,
+                Amount = 7200,
+                CurrencyCharCode = "RUB"
+            });
+
+            await _accountManagementService.Transfer(new AccountTransferParameters
+            {
+                FromAccount = accountEur,
+                ToAccount = accountUsd,
+                Amount = 7200,
+                CurrencyCharCode = "RUB"
+            });
+
             var usd = await _accountManagementService.GetAccount(accountUsd);
             var byn = await _accountManagementService.GetAccount(accountByn);
             var eur = await _accountManagementService.GetAccount(accountEur);
             var rur = await _accountManagementService.GetAccount(accountRur);
 
+            foreach (var activity in _activityTracker.GetActivities(usd.Id))
+            {
+                Console.WriteLine($"USD account activity: {activity.AccountId} {activity.Type} {activity.Amount}" );
+            }
+
+            foreach (var activity in _activityTracker.GetActivities(eur.Id))
+            {
+                Console.WriteLine($"EUR account activity: {activity.AccountId} {activity.Type} {activity.Amount}" );
+            }
+
+            foreach (var activity in _activityTracker.GetActivities(byn.Id))
+            {
+                Console.WriteLine($"BYN account activity: {activity.AccountId} {activity.Type} {activity.Amount}" );
+            }
+
+            foreach (var activity in _activityTracker.GetActivities(rur.Id))
+            {
+                Console.WriteLine($"RUB account activity: {activity.AccountId} {activity.Type} {activity.Amount}" );
+            }
 
             // await RunInfo();
             Console.WriteLine(Guid.NewGuid());
@@ -57,7 +101,6 @@ namespace Portal
 
         private static async Task RunInfo()
         {
-
             var currencies = await _infoService.GetAvailableCurrencies();
 
             foreach (var currency in currencies)
