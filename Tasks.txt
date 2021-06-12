@@ -1,9 +1,5 @@
 Tasks
 
-1. Complete convertion to 3 currencies
-2. Find rate for a specific date
-3. Find max, min, avg USD rate for 2020 year
-4. performance tuning (caching)
-5. ЦБ РФ (http://www.cbr.ru/scripts/XML_daily.asp?date_req=02/03/2021)
-6. Refactoring
-7.(*) Persist state (embedded resource?)
+1. transactions
+2. locking
+3. operation result

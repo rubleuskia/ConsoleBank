@@ -60,8 +60,11 @@ namespace Currencies.Common.Caching
         {
             if (_ratesCache.ContainsKey(key))
             {
-                var value = _ratesCache[key];
-                value.Add(rate);
+                List<CurrencyRateModel> value = _ratesCache[key];
+                if (value.All(x => x.CharCode != rate.CharCode))
+                {
+                    value.Add(rate);
+                }
             }
             else
             {

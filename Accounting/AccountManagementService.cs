@@ -37,16 +37,26 @@ namespace Accounting
             return _accountsRepository.Delete(accountId);
         }
 
-        public Task Withdraw(Guid accountId, decimal amount)
+        public async Task Withdraw(Guid accountId, decimal amount)
         {
             AssertValidAmount(amount);
-            return _accountAcquiringService.Withdraw(accountId, amount);
+            var lockKey = Guid.NewGuid();
+            if (await _accountAcquiringService.TryLock(accountId, lockKey))
+            {
+                await _accountAcquiringService.Withdraw(accountId, amount, lockKey);
+                await _accountAcquiringService.Unlock(accountId, lockKey);
+            }
         }
 
-        public Task Acquire(Guid accountId, decimal amount)
+        public async Task Acquire(Guid accountId, decimal amount)
         {
             AssertValidAmount(amount);
-            return _accountAcquiringService.Acquire(accountId, amount);
+            var lockKey = Guid.NewGuid();
+            if (await _accountAcquiringService.TryLock(accountId, lockKey))
+            {
+                await _accountAcquiringService.Acquire(accountId, amount, lockKey);
+                await _accountAcquiringService.Unlock(accountId, lockKey);
+            }
         }
 
         public Task Transfer(AccountTransferParameters parameters)

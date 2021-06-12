@@ -5,7 +5,9 @@ namespace Accounting
 {
     public interface IAccountAcquiringService
     {
-        Task Withdraw(Guid accountId, decimal amount);
-        Task Acquire(Guid accountId, decimal amount);
+        Task<bool> TryLock(Guid accountId, Guid key);
+        Task Withdraw(Guid accountId, decimal amount, Guid lockKey);
+        Task Acquire(Guid accountId, decimal amount, Guid lockKey);
+        Task Unlock(Guid accountId, Guid lockKey);
     }
 }

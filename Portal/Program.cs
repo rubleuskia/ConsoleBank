@@ -32,7 +32,7 @@ namespace Portal
             var accountRur = await _accountManagementService.CreateAccount(Guid.NewGuid(), "RUR");
 
             await _accountManagementService.Acquire(accountUsd, 100);
-            await _accountManagementService.Acquire(accountEur, 100);
+            await _accountManagementService.Acquire(accountEur, 1000000);
             await _accountManagementService.Acquire(accountByn, 1000);
             await _accountManagementService.Acquire(accountRur, 10000);
 
