@@ -4,3 +4,5 @@ Tasks
 2. locking
 3. operation result
 4. tracker - log all activities for analysis (activity type, account id, amount)
+5. event bus
+6. unit tests
