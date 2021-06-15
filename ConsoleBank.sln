@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currencies", "Currencies\Cu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting", "Accounting\Accounting.csproj", "{FA09E5CB-9C2B-46F1-AAF9-F6CB8467D199}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Currencies.Tests", "Currencies.Tests\Currencies.Tests.csproj", "{CE87F912-FF57-4C33-8DFC-5EC4175C3DF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{FA09E5CB-9C2B-46F1-AAF9-F6CB8467D199}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA09E5CB-9C2B-46F1-AAF9-F6CB8467D199}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA09E5CB-9C2B-46F1-AAF9-F6CB8467D199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE87F912-FF57-4C33-8DFC-5EC4175C3DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE87F912-FF57-4C33-8DFC-5EC4175C3DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE87F912-FF57-4C33-8DFC-5EC4175C3DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE87F912-FF57-4C33-8DFC-5EC4175C3DF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

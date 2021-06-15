@@ -1,0 +1,12 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=912153bd_002D1e2c_002D4b62_002D8b25_002D77ff8248108e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ConvertToLocal_OneToOne_ReturnsInitialAmount" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_OneToOne_ReturnsInitialAmount&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_NegativeRate_ReturnsNegativeResult&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_ZeroAmount_ReturnsZero&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_ZeroNominal_ReturnsZero&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_ZeroNominal_ThrowsException&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::CE87F912-FF57-4C33-8DFC-5EC4175C3DF0::net5.0::Currencies.Tests.CurrenciesConverterTests.ConvertToLocal_Always_ReturnsResult&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Currencies.Common.Conversion;
 
@@ -18,6 +19,8 @@ namespace Accounting
             _accountAcquiringService = accountAcquiringService;
             _currencyConversionService = currencyConversionService;
         }
+
+        public event Action<Guid, Guid, decimal> Transferred = (_, _, _) => {};
 
         public async Task Transfer(AccountTransferParameters parameters)
         {
@@ -46,8 +49,9 @@ namespace Accounting
                 parameters.Amount);
 
             await _accountAcquiringService.Acquire(parameters.ToAccount, acquireAmount);
-
             // finally - unlock/rollback/etc
+
+            Transferred(fromAccount.Id, toAccount.Id, parameters.Amount); // + charCode
         }
     }
 }

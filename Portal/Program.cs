@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Accounting;
+using Accounting.Tracking;
 using Currencies.Apis.Byn;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
@@ -22,7 +25,13 @@ namespace Portal
             new AccountTransferService(repository, acquiringService,conversionService);
 
         private static AccountManagementService _accountManagementService =
-            new AccountManagementService(repository, acquiringService, transferService);
+            new(repository, acquiringService, transferService);
+
+        private static AccountOperationsTrackingService _trackingService = new(
+            acquiringService,
+            transferService,
+            () => DateTime.Now.AddHours(3)
+        );
 
         static async Task Main(string[] args)
         {
@@ -49,6 +58,10 @@ namespace Portal
             var eur = await _accountManagementService.GetAccount(accountEur);
             var rur = await _accountManagementService.GetAccount(accountRur);
 
+            foreach (var operation in _trackingService.GetOperations().GetTranferredInfos())
+            {
+                Console.WriteLine($"Operation: {operation.AccountId} - {operation.Type} - {operation.Amount}");
+            }
 
             // await RunInfo();
             Console.WriteLine(Guid.NewGuid());
@@ -57,7 +70,6 @@ namespace Portal
 
         private static async Task RunInfo()
         {
-
             var currencies = await _infoService.GetAvailableCurrencies();
 
             foreach (var currency in currencies)

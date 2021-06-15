@@ -9,6 +9,7 @@ using Flurl.Http;
 
 namespace Currencies.Apis.Byn
 {
+    // TODO cover by tests https://flurl.dev/docs/testable-http/
     public class BynCurrenciesApi : ICurrenciesApi
     {
         // TODO BYN
