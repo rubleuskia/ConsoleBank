@@ -3,6 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Accounting;
+using Currencies.Apis.Byn;
+using Currencies.Common.Caching;
+using Currencies.Common.Conversion;
+using Currencies.Common.Infos;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -19,6 +24,20 @@ namespace TelegramBotApp
         private static TelegramBotClient _botClient;
         private static string x_1 = "1846376011";
         private static string x_2 = "AAEHgzBmg7uYh6VsNiNmFs4oqEqIIJJYMO8";
+
+        private static ICurrenciesApiCacheService apiCache =
+            new CurrenciesApiCacheService(new BynCurrenciesApi());
+        private static ICurrencyInfoService _infoService =
+            new CurrencyInfoService(apiCache, new CurrencyConversionService(apiCache));
+
+        private static IAccountsRepository repository = new AccountsRepository();
+        private static IAccountAcquiringService acquiringService = new AccountAcquiringService(repository);
+        private static ICurrencyConversionService conversionService = new CurrencyConversionService(apiCache);
+        private static IAccountTransferService transferService =
+            new AccountTransferService(repository, acquiringService,conversionService);
+
+        private static AccountManagementService _accountManagementService =
+            new(repository, acquiringService, transferService);
 
         static void Main(string[] args)
         {
@@ -63,8 +82,8 @@ namespace TelegramBotApp
 
         private static async Task BotOnMessageReceived(Message message)
         {
-            Console.WriteLine($"Receive message type: {message.Type}");
-            if (message.Type != MessageType.Text)
+            Console.WriteLine($"Receive message type: {message?.Type}");
+            if (message == null || message.Type != MessageType.Text)
             {
                 return;
             }
@@ -75,6 +94,7 @@ namespace TelegramBotApp
                 "/keyboard" => SendReplyKeyboard(message),
                 "/photo" => SendFile(message),
                 "/request" => RequestContactAndLocation(message),
+                "/rate" => RequestRate(message),
                 _ => Usage(message)
             };
 
@@ -127,7 +147,6 @@ namespace TelegramBotApp
                     chatId: message.Chat.Id,
                     text: "Choose",
                     replyMarkup: replyKeyboardMarkup
-
                 );
             }
 
@@ -177,6 +196,17 @@ namespace TelegramBotApp
                     replyMarkup: new ReplyKeyboardRemove()
                 );
             }
+        }
+
+        private static async Task RequestRate(Message message)
+        {
+            var charCode = message.Text.Split(" ").Last();
+            var rate = await _infoService.GetCurrencyRate(charCode);
+
+            await _botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: $"{charCode} rate today is: {rate}"
+            );
         }
 
         // Process Inline Keyboard callback data
