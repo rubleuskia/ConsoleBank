@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Common;
+using Common.Accounting;
 
 namespace Accounting.Tracking
 {
@@ -11,17 +13,22 @@ namespace Accounting.Tracking
     public class AccountOperationsTrackingService : IAccountOperationsTrackingService
     {
         private readonly GetNowAtSite _getNowAtSite;
+        private readonly IEventBus _eventBus;
         private readonly List<AccountOperationInfo> _operations = new();
 
-        public AccountOperationsTrackingService(
-            IAccountAcquiringService accountAcquiringService,
-            IAccountTransferService transferService,
-            GetNowAtSite getNowAtSite)
+        public AccountOperationsTrackingService(GetNowAtSite getNowAtSite, IEventBus eventBus)
         {
             _getNowAtSite = getNowAtSite;
-            accountAcquiringService.Acquired += HandleAcquiringEvent;
-            accountAcquiringService.Withdrawn += HandleWithdrawnEvent;
-            transferService.Transferred += HandleTransferredEvent;
+            _eventBus = eventBus;
+
+            SubscribeOnEvents();
+        }
+
+        private void SubscribeOnEvents()
+        {
+            _eventBus.Subscribe<AccountAcquiredEvent>(HandleAcquiringEvent);
+            _eventBus.Subscribe<AccountWithdrawEvent>(HandleWithdrawnEvent);
+            _eventBus.Subscribe<AccountTransferEvent>(HandleTransferredEvent);
         }
 
         public AccountOperationInfoCollection GetOperations()
@@ -29,20 +36,20 @@ namespace Accounting.Tracking
             return new(_operations);
         }
 
-        private void HandleAcquiringEvent(Guid accountId, decimal amount)
+        private void HandleAcquiringEvent(AccountAcquiredEvent @event)
         {
-            AddOperationInfo(accountId, amount, AccountOperationType.Acquire);
+            AddOperationInfo(@event.AccountId, @event.Amount, AccountOperationType.Acquire);
         }
 
-        private void HandleWithdrawnEvent(Guid accountId, decimal amount)
+        private void HandleWithdrawnEvent(AccountWithdrawEvent @event)
         {
-            AddOperationInfo(accountId, amount, AccountOperationType.Withdraw);
+            AddOperationInfo(@event.AccountId, @event.Amount, AccountOperationType.Withdraw);
         }
 
-        private void HandleTransferredEvent(Guid fromAccount, Guid toAccount, decimal amount)
+        private void HandleTransferredEvent(AccountTransferEvent @event)
         {
-            AddOperationInfo(fromAccount, -amount, AccountOperationType.Transfer);
-            AddOperationInfo(toAccount, amount, AccountOperationType.Transfer);
+            AddOperationInfo(@event.FromAccount, -@event.Amount, AccountOperationType.Transfer);
+            AddOperationInfo(@event.ToAccount, @event.Amount, AccountOperationType.Transfer);
         }
 
         private void AddOperationInfo(Guid accountId, decimal amount, AccountOperationType type)

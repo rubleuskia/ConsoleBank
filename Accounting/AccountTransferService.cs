@@ -1,11 +1,14 @@
 using System;
 using System.Threading.Tasks;
+using Common;
+using Common.Accounting;
 using Currencies.Common.Conversion;
 
 namespace Accounting
 {
     public class AccountTransferService : IAccountTransferService
     {
+        private readonly IEventBus _eventBus;
         private readonly IAccountsRepository _accountsRepository;
         private readonly IAccountAcquiringService _accountAcquiringService;
         private readonly ICurrencyConversionService _currencyConversionService;
@@ -13,14 +16,14 @@ namespace Accounting
         public AccountTransferService(
             IAccountsRepository accountsRepository,
             IAccountAcquiringService accountAcquiringService,
-            ICurrencyConversionService currencyConversionService)
+            ICurrencyConversionService currencyConversionService,
+            IEventBus eventBus)
         {
             _accountsRepository = accountsRepository;
             _accountAcquiringService = accountAcquiringService;
             _currencyConversionService = currencyConversionService;
+            _eventBus = eventBus;
         }
-
-        public event Action<Guid, Guid, decimal> Transferred = (_, _, _) => {};
 
         public async Task Transfer(AccountTransferParameters parameters)
         {
@@ -51,7 +54,12 @@ namespace Accounting
             await _accountAcquiringService.Acquire(parameters.ToAccount, acquireAmount);
             // finally - unlock/rollback/etc
 
-            Transferred(fromAccount.Id, toAccount.Id, parameters.Amount); // + charCode
+            _eventBus.Publish(new AccountTransferEvent
+            {
+                Amount = parameters.Amount,
+                ToAccount = toAccount.Id,
+                FromAccount = fromAccount.Id
+            });
         }
     }
 }

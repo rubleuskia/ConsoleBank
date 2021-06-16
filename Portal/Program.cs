@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Accounting;
 using Accounting.Tracking;
+using Common;
 using Currencies.Apis.Byn;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
@@ -16,32 +17,30 @@ namespace Portal
 {
     class Program
     {
+        private static IEventBus _eventBus = new EventBus();
         private static ICurrenciesApiCacheService apiCache =
             new CurrenciesApiCacheService(new BynCurrenciesApi());
         private static ICurrencyInfoService _infoService =
             new CurrencyInfoService(apiCache, new CurrencyConversionService(apiCache));
 
         private static IAccountsRepository repository = new AccountsRepository();
-        private static IAccountAcquiringService acquiringService = new AccountAcquiringService(repository);
+        private static IAccountAcquiringService acquiringService = new AccountAcquiringService(repository, _eventBus);
         private static ICurrencyConversionService conversionService = new CurrencyConversionService(apiCache);
         private static IAccountTransferService transferService =
-            new AccountTransferService(repository, acquiringService,conversionService);
+            new AccountTransferService(repository, acquiringService,conversionService, _eventBus);
 
         private static AccountManagementService _accountManagementService =
             new(repository, acquiringService, transferService);
 
-        private static AccountOperationsTrackingService _trackingService = new(
-            acquiringService,
-            transferService,
-            () => DateTime.Now.AddHours(3)
-        );
+        private static AccountOperationsTrackingService _trackingService =
+            new(() => DateTime.Now.AddHours(3), _eventBus);
 
         private static TelegramBotClient _botClient;
 
         static async Task Main(string[] args)
         {
-            // await RunAccounting();
-            await RunInfo();
+            await RunAccounting();
+            // await RunInfo();
 
             _botClient = new TelegramBotClient("1846376011:AAEHgzBmg7uYh6VsNiNmFs4oqEqIIJJYMO8");
 
@@ -108,7 +107,7 @@ namespace Portal
             var eur = await _accountManagementService.GetAccount(accountEur);
             var rur = await _accountManagementService.GetAccount(accountRur);
 
-            foreach (var operation in _trackingService.GetOperations().GetTranferredInfos())
+            foreach (var operation in _trackingService.GetOperations())
             {
                 Console.WriteLine($"Operation: {operation.AccountId} - {operation.Type} - {operation.Amount}");
             }
