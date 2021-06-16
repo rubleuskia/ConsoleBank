@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Currencies\Currencies.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Telegram.Bot" Version="16.0.0" />
+    </ItemGroup>
+
 </Project>

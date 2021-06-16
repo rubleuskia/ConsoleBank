@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Accounting;
 using Accounting.Tracking;
@@ -8,6 +9,8 @@ using Currencies.Apis.Byn;
 using Currencies.Common.Caching;
 using Currencies.Common.Conversion;
 using Currencies.Common.Infos;
+using Telegram.Bot;
+using Telegram.Bot.Args;
 
 namespace Portal
 {
@@ -33,7 +36,54 @@ namespace Portal
             () => DateTime.Now.AddHours(3)
         );
 
+        private static TelegramBotClient _botClient;
+
         static async Task Main(string[] args)
+        {
+            // await RunAccounting();
+            await RunInfo();
+
+            _botClient = new TelegramBotClient("1846376011:AAEHgzBmg7uYh6VsNiNmFs4oqEqIIJJYMO8");
+
+            _botClient.OnMessage += OnBotMessage;
+            _botClient.StartReceiving();
+
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey();
+
+            _botClient.StopReceiving();
+        }
+
+        private static async void OnBotMessage(object sender, MessageEventArgs eventArgs)
+        {
+            var message = eventArgs.Message.Text;
+            if (message == null)
+            {
+                return;
+            }
+
+            var parts = message.Split(" ");
+            if (parts.First() == "rate")
+            {
+                var charCode = parts.Last();
+                var rate = await _infoService.GetCurrencyRate(charCode);
+                await _botClient.SendTextMessageAsync(
+                    chatId: eventArgs.Message.Chat,
+                    text: $"{charCode} rate: {rate}"
+                );
+
+                return;
+            }
+
+            Console.WriteLine($"Received a text message in chat {eventArgs.Message.Chat.Id}.");
+
+            await _botClient.SendTextMessageAsync(
+                chatId: eventArgs.Message.Chat,
+                text: "You said:\n" + eventArgs.Message.Text
+            );
+        }
+
+        private static async Task RunAccounting()
         {
             var accountUsd = await _accountManagementService.CreateAccount(Guid.NewGuid(), "USD");
             var accountEur = await _accountManagementService.CreateAccount(Guid.NewGuid(), "EUR");
@@ -62,10 +112,6 @@ namespace Portal
             {
                 Console.WriteLine($"Operation: {operation.AccountId} - {operation.Type} - {operation.Amount}");
             }
-
-            // await RunInfo();
-            Console.WriteLine(Guid.NewGuid());
-            Console.ReadLine();
         }
 
         private static async Task RunInfo()
@@ -82,10 +128,10 @@ namespace Portal
             Console.WriteLine($"USD rate: {usdRate}");
             Console.WriteLine($"EUR rate: {eurRate}");
 
-            // var result1 = await _infoService.ConvertFrom(100, "USD");
-            // Console.WriteLine("1: " + result1);
-            // var result2 = await _infoService.ConvertTo(1000, "RUB");
-            // Console.WriteLine("2: " + result2);
+            var result1 = await _infoService.ConvertFromLocal(100, "USD");
+            Console.WriteLine("1: " + result1);
+            var result2 = await _infoService.ConvertToLocal(1000, "RUB");
+            Console.WriteLine("2: " + result2);
 
             var avg = await _infoService.GetAvgRate("USD", new DateTime(2020, 1, 1), new DateTime(2020, 12, 31));
             var min = await _infoService.GetMinRate("USD", new DateTime(2020, 1, 1), new DateTime(2020, 12, 31));

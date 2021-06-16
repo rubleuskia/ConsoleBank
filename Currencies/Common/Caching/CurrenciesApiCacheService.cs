@@ -45,6 +45,8 @@ namespace Currencies.Common.Caching
                 {
                     return await GetNewCurrencyRate(charCode, onDate);
                 }
+
+                return rate;
             }
 
             return await GetNewCurrencyRate(charCode, onDate);
@@ -61,7 +63,10 @@ namespace Currencies.Common.Caching
             if (_ratesCache.ContainsKey(key))
             {
                 var value = _ratesCache[key];
-                value.Add(rate);
+                if (value.All(r => r.CharCode != rate.CharCode))
+                {
+                    value.Add(rate);
+                }
             }
             else
             {
